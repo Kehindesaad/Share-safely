@@ -1,69 +1,62 @@
+<!-- public/index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>File Upload App</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
-        }
-        h1 {
-            color: #333;
-        }
-        form {
-            margin-top: 20px;
-        }
-        input[type="file"] {
-            margin-bottom: 10px;
-        }
-        button {
-            padding: 10px 15px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>File Upload</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 50px;
+      text-align: center;
+    }
+    input[type="file"] {
+      margin: 20px 0;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #218838;
+    }
+  </style>
 </head>
 <body>
-    <h1>Upload a File</h1>
-    <form id="uploadForm" enctype="multipart/form-data">
-        <input type="file" name="file" required />
-        <br />
-        <button type="submit">Upload</button>
-    </form>
-    <div id="result"></div>
+  <h1>Upload a File</h1>
+  <form id="uploadForm" enctype="multipart/form-data">
+    <input type="file" id="fileInput" name="file" required />
+    <br />
+    <button type="submit">Upload File</button>
+  </form>
+  <p id="message"></p>
 
-    <script>
-        const form = document.getElementById('uploadForm');
-        const resultDiv = document.getElementById('result');
+  <script>
+    const form = document.getElementById('uploadForm');
+    const message = document.getElementById('message');
 
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault(); // Prevent the default form submission
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const fileInput = document.getElementById('fileInput');
+      const formData = new FormData();
+      formData.append('file', fileInput.files[0]);
 
-            const formData = new FormData(form);
-            try {
-                const response = await fetch('/upload', {
-                    method: 'POST',
-                    body: formData,
-                });
-                const data = await response.json();
-                if (response.ok) {
-                    resultDiv.innerHTML = `<p>${data.message}</p><p>Download link: <a href="${data.link}">${data.link}</a></p>`;
-                } else {
-                    resultDiv.innerHTML = `<p>Error: ${data.message}</p>`;
-                }
-            } catch (error) {
-                resultDiv.innerHTML = `<p>Error uploading file: ${error.message}</p>`;
-            }
+      try {
+        const response = await fetch('/upload', {
+          method: 'POST',
+          body: formData,
         });
-    </script>
+
+        const result = await response.text();
+        message.textContent = result;
+      } catch (error) {
+        message.textContent = 'Error uploading file.';
+      }
+    });
+  </script>
 </body>
 </html>
-
